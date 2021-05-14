@@ -13,7 +13,7 @@ public class Main {
 			
 		};
 		
-		AlgoritmoGenetico algoritmo = new AlgoritmoGenetico(0.1, 2, 1000, 10, 3, function);
+		AlgoritmoGenetico algoritmo = new AlgoritmoGenetico(0.1, 2, 1000, 1000, 3, function);
 		algoritmo.run();
 	}
 }

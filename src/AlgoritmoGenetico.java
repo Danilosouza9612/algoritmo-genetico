@@ -132,7 +132,7 @@ public class AlgoritmoGenetico {
 	
 	public void printPopulacao() {
 		for(Individuo individuo : this.individuos) {
-			System.out.println(individuo.getFitness());
+			System.out.println(individuo);
 		}
 	}
 }

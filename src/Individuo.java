@@ -29,12 +29,16 @@ public class Individuo implements Comparable<Individuo>{
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("F(");
 		for(int i=0; i<x.length; i++) {
 			sb.append(x[i]);
 			if(i<(x.length-1)) {
 				sb.append(", ");
 			}
 		}
+		sb.append(")");
+		sb.append(" = ");
+		sb.append(this.fitness);
 		return sb.toString();
 	}
 	
