@@ -9,8 +9,21 @@ public class AlgoritmoGenetico {
 	private Individuo[] individuos;
 	private Function function;
 	private int nElitism;
+	private Crossover crossover;
+	private int qtdFilhos;
+	private GenerationOptions options;
 	
-	public AlgoritmoGenetico(double taxaMutacao, int nTorneio, int population, int generations, int nElitism, Function function) {
+	public AlgoritmoGenetico(
+			double taxaMutacao, 
+			int nTorneio, 
+			int population, 
+			int generations, 
+			int nElitism, 
+			Function function, 
+			Crossover crossover,
+			GenerationOptions options,
+			int qtdFilhos
+		) {
 		super();
 		this.taxaMutacao = taxaMutacao;
 		this.nTorneio = nTorneio;
@@ -18,6 +31,9 @@ public class AlgoritmoGenetico {
 		this.individuos = new Individuo[population];
 		this.function = function;
 		this.nElitism = nElitism;
+		this.crossover = crossover;
+		this.qtdFilhos = qtdFilhos;
+		this.options = options;
 		this.populate();
 	}
 	
@@ -56,21 +72,6 @@ public class AlgoritmoGenetico {
 		return maior;
 	}
 	
-	public Individuo uniformCrossover(Individuo a, Individuo b) {
-		Random random = new Random();
-		double[] x = new double[5];
-		int sorteio;
-		for(int i=0; i<x.length; i++) {
-			sorteio = random.nextInt(2);
-			if(sorteio==0) {
-				x[i]=a.x[i];
-			}else {
-				x[i]=b.x[i];
-			}
-		}
-		return new Individuo(x);
-	}
-	
 	public Individuo mutation(Individuo a) {
 		double newValue = this.generateNumber();
 		double pos = new Random().nextInt(5);
@@ -86,32 +87,72 @@ public class AlgoritmoGenetico {
 	}
 	
 	public void run() {
-		Individuo a, b, novo;
 		Individuo[] novaGeracao;
 		Individuo[] elite;
-		Random random = new Random();
-		double sorteioProb;
 		for(int i=1; i<this.generations; i++) {
 			novaGeracao = new Individuo[this.individuos.length];
 			elite = this.elitism();
+			System.out.println(elite[0]+" para K = "+i);
 			for(int j=0; j<elite.length; j++) {
 				novaGeracao[j]=elite[j];
 			}
-			for(int j=3; j<this.individuos.length; j++) {
-				a = this.torneio();
-				b = this.torneio();
-				novo = this.uniformCrossover(a, b);
-				sorteioProb = random.nextDouble();
-				if(sorteioProb<this.taxaMutacao) {
+			if(this.options == GenerationOptions.CROSSOVER_AND_MUTATE) {
+				this.crossoverAndMutate(novaGeracao);
+			}else {
+				this.crossoverOrMutate(novaGeracao);
+			}
+			this.individuos = novaGeracao;
+		}
+	}
+	
+	private void crossoverAndMutate(Individuo[] novaGeracao) {
+		Individuo a, b, novo;
+		int count=0;
+		for(int j=3; j<this.individuos.length; j++) {
+			a = this.torneio();
+			b = this.torneio();
+			for(int k=0; k<this.qtdFilhos; k++) {
+				if(j==this.individuos.length) break;
+				novo = this.crossover.cross(a, b);
+				if(count==this.taxaMutacao*100) {
 					novo = this.mutation(novo);
+					count=0;
+				}else {
+					count++;
 				}
 				novo.calculateFitness(this.function);
 				novaGeracao[j]=novo;
+				j++;
 			}
-			this.individuos = novaGeracao;
-			this.printPopulacao();
+			j--;
 		}
 	}
+	
+	private void crossoverOrMutate(Individuo[] novaGeracao) {
+		Individuo a, b, novo;
+		int count=0;
+		for(int j=3; j<this.individuos.length; j++) {
+			a = this.torneio();
+			b = this.torneio();
+			if(count<this.taxaMutacao*100) {
+				for(int k=0; k<this.qtdFilhos; k++) {
+					if(j==this.individuos.length) break;
+					novo = this.crossover.cross(a, b);
+					novo.calculateFitness(this.function);
+					novaGeracao[j]=novo;
+					j++;
+					count++;
+				}
+				j--;
+			}else {
+				novo = this.mutation(a);
+				novo.calculateFitness(this.function);
+				novaGeracao[j]=novo;
+				count=0;
+			}
+		}
+	}
+
 	
 	public Individuo[] elitism() {
 		Individuo[] individuos = Arrays.copyOf(this.individuos, this.individuos.length);

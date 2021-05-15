@@ -8,12 +8,12 @@ public class Main {
 			@Override
 			public double getFx(Individuo individuo) {
 				// TODO Auto-generated method stub
-				return individuo.x[0] + 2*individuo.x[1] + Math.pow(individuo.x[2], 2) - individuo.x[3]; 
+				return individuo.x[0] + 2*individuo.x[1] - Math.pow(individuo.x[2], 2) - Math.cos(individuo.x[3]); 
 			}
 			
 		};
 		
-		AlgoritmoGenetico algoritmo = new AlgoritmoGenetico(0.1, 2, 1000, 1000, 3, function);
+		AlgoritmoGenetico algoritmo = new AlgoritmoGenetico(0.1, 2, 1000, 1000, 3, function, new OneCutPointCrossover(), GenerationOptions.CROSSOVER_AND_MUTATE, 2);
 		algoritmo.run();
 	}
 }
