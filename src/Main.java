@@ -13,7 +13,7 @@ public class Main {
 			
 		};
 		
-		AlgoritmoGenetico algoritmo = new AlgoritmoGenetico(0.1, 2, 1000, 1000, 3, function, new OneCutPointCrossover(), GenerationOptions.CROSSOVER_AND_MUTATE, 2);
+		AlgoritmoGenetico algoritmo = new AlgoritmoGenetico(new IntervaloBusca(-100, 100), 0.1, 2, 1000, 200, 3, function, new OneCutPointCrossover(), GenerationOptions.CROSSOVER_AND_MUTATE, 2);
 		algoritmo.run();
 	}
 }

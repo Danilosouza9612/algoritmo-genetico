@@ -3,6 +3,7 @@ import java.util.Comparator;
 import java.util.Random;
 
 public class AlgoritmoGenetico {
+	private IntervaloBusca intervalo;
 	private double taxaMutacao;
 	private int nTorneio;
 	private int generations;
@@ -14,6 +15,7 @@ public class AlgoritmoGenetico {
 	private GenerationOptions options;
 	
 	public AlgoritmoGenetico(
+			IntervaloBusca intervalo,
 			double taxaMutacao, 
 			int nTorneio, 
 			int population, 
@@ -25,6 +27,7 @@ public class AlgoritmoGenetico {
 			int qtdFilhos
 		) {
 		super();
+		this.intervalo = intervalo;
 		this.taxaMutacao = taxaMutacao;
 		this.nTorneio = nTorneio;
 		this.generations = generations;
@@ -51,8 +54,8 @@ public class AlgoritmoGenetico {
 	
 	private double generateNumber() {
 		Random random = new Random();
-		double t1 = random.nextDouble()*100;
-		double t2 = random.nextDouble()*100;
+		double t1 = random.nextDouble()*this.intervalo.getMaior();
+		double t2 = -random.nextDouble()*this.intervalo.getMenor();
 		return t1-t2;
 	}
 	
@@ -61,7 +64,7 @@ public class AlgoritmoGenetico {
 		Random random = new Random();
 		Individuo maior;
 		for(int i=0; i<selected.length; i++) {
-			selected[i]=this.individuos[random.nextInt(999)];
+			selected[i]=this.individuos[random.nextInt(this.individuos.length)];
 		}
 		maior=selected[0];
 		for(int i=1; i<selected.length; i++) {
@@ -90,6 +93,9 @@ public class AlgoritmoGenetico {
 		Individuo[] novaGeracao;
 		Individuo[] elite;
 		for(int i=1; i<this.generations; i++) {
+			if(i==20) {
+				this.printPopulacao();
+			}
 			novaGeracao = new Individuo[this.individuos.length];
 			elite = this.elitism();
 			System.out.println(elite[0]+" para K = "+i);
@@ -103,6 +109,8 @@ public class AlgoritmoGenetico {
 			}
 			this.individuos = novaGeracao;
 		}
+		elite = this.elitism();
+		System.out.println(elite[0]+" para K = "+this.generations);
 	}
 	
 	private void crossoverAndMutate(Individuo[] novaGeracao) {
